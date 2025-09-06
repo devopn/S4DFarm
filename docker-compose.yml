@@ -7,7 +7,7 @@ services:
       - ./server/app:/app
     environment:
       REDIS_URL: 'redis://redis:6379/0'
-      POSTGRES_DSN: 'host=postgres port=5432 user=farm password=farm dbname=farm'
+      POSTGRES_DSN: 'host=postgres port=5432 user=cut password=083adf8f dbname=farm'
       SERVER_PASSWORD: ${SERVER_PASSWORD}
     restart: unless-stopped
     depends_on:
@@ -22,7 +22,7 @@ services:
       - ./server/app:/app
     environment:
       CELERY_BROKER_URL: 'redis://redis:6379/1'
-      POSTGRES_DSN: 'host=postgres port=5432 user=farm password=farm dbname=farm'
+      POSTGRES_DSN: 'host=postgres port=5432 user=cut password=083adf8f dbname=farm'
     restart: unless-stopped
     depends_on:
       postgres:
@@ -34,19 +34,19 @@ services:
       dockerfile: ./docker/front/Dockerfile
     restart: unless-stopped
     ports:
-      - "5137:80"
+      - "127.0.0.1:60001:80"
 
   postgres:
     image: postgres:14.1-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: farm
-      POSTGRES_PASSWORD: farm
+      POSTGRES_USER: cut
+      POSTGRES_PASSWORD: 083adf8f
       POSTGRES_DB: farm
     volumes:
       - ./vol/db:/var/lib/postgresql/data
     healthcheck:
-      test: pg_isready -U farm -d farm
+      test: pg_isready -U cut -d farm
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,7 +58,7 @@ services:
     environment:
       REDIS_URL: 'redis://redis:6379/2'
     ports:
-      - "8888:8888"
+      - "127.0.0.1:8888:8888"
     depends_on:
       - redis
 
@@ -69,11 +69,11 @@ services:
     volumes:
       - ./vol/redis:/data
 
-  external_redis:
-    image: redis:7.2.0-alpine
-    ports:
-      - "6378:6379"
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${EXTERNAL_REDIS_PASSWORD:-changeme}"]
-    volumes:
-      - ./vol/external_redis:/data
+  # external_redis:
+  #   image: redis:7.2.0-alpine
+  #   ports:
+  #     - "6378:6379"
+  #   restart: unless-stopped
+  #   command: ["redis-server", "--appendonly", "yes", "--requirepass", "${EXTERNAL_REDIS_PASSWORD:-changeme}"]
+  #   volumes:
+  #     - ./vol/external_redis:/data
